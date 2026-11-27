@@ -47,22 +47,22 @@ def main():
         sys.exit("MEDWAY_B2B_TOKEN não definido")
     print("health:", get("/health", auth=False))
 
-    first = get("/contratos")
-    pages = [first]
+    # A API devolve {total, limit, offset, contratos}: pagina por offset até cobrir o total
+    limit = 100
+    pages = [get("/contratos", {"limit": limit, "offset": 0})]
+    total = int(pages[0].get("total", 0))
+    offset = len(pages[0].get("contratos", []))
+    while offset < total:
+        page = get("/contratos", {"limit": limit, "offset": offset})
+        got = len(page.get("contratos", []))
+        if got == 0:
+            break
+        pages.append(page)
+        offset += got
 
-    # Paginação: segue os formatos mais comuns se existirem
-    if isinstance(first, dict):
-        total_pages = first.get("total_pages") or first.get("pages") or first.get("totalPages")
-        nxt = first.get("next") or (first.get("links") or {}).get("next")
-        if total_pages:
-            for p in range(2, int(total_pages) + 1):
-                pages.append(get("/contratos", {"page": p}))
-        else:
-            seen = 0
-            while nxt and seen < 500:
-                pages.append(get(nxt if nxt.startswith("/") else nxt.replace(BASE_URL, "")))
-                nxt = pages[-1].get("next") or (pages[-1].get("links") or {}).get("next")
-                seen += 1
+    n = sum(len(p.get("contratos", [])) for p in pages)
+    if n != total:
+        sys.exit(f"Coleta incompleta: {n} de {total} contratos")
 
     OUT.parent.mkdir(parents=True, exist_ok=True)
     payload = {

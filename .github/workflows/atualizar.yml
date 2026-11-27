@@ -6,18 +6,23 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths: ["pipeline/**", "data/raw/b2c_vendas.csv", ".github/workflows/**", "dashboard/**"]
+    paths: ["pipeline/**", "data/raw/b2c_vendas.csv", ".github/workflows/**", "dashboard/index.html"]
 
 permissions:
   contents: write
+  pages: write
+  id-token: write
 
 concurrency:
   group: atualizar
   cancel-in-progress: false
 
 jobs:
-  coletar:
+  atualizar:
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
 
@@ -25,15 +30,34 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Coletar B2B (API)
+      # Se a API falhar, o passo seguinte usa a última coleta válida do repositório
+      - name: Coletar B2B (API com token)
+        id: coleta
+        continue-on-error: true
         env:
           MEDWAY_B2B_TOKEN: ${{ secrets.MEDWAY_B2B_TOKEN }}
         run: python pipeline/fetch_b2b.py
 
-      - name: Gravar no repositório
+      - name: Tratar e consolidar B2C + B2B
+        env:
+          B2C_SHEET_CSV_URL: ${{ vars.B2C_SHEET_CSV_URL }}
+        run: python pipeline/processar.py
+
+      - name: Gravar dados tratados no repositório
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/
+          git add data/ dashboard/data.json
           git diff --cached --quiet || git commit -m "dados: atualização automática $(date -u +%F)"
           git push
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dashboard
+      - id: deploy
+        uses: actions/deploy-pages@v4
+
+      - name: Avisar se a coleta da API falhou
+        if: steps.coleta.outcome == 'failure'
+        run: echo "::warning::Coleta B2B falhou; dashboard publicado com a última base válida."

@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Performance de Vendas · Case SalesOps</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/*
+VOICE: painel de gestão, sóbrio, achado primeiro e número logo abaixo.
+IDEA: um quadro de horários de transporte: faixas de cor cheia, números grandes e régua de leitura.
+PICTURE: gráfico mensal grande no topo de cada aba, B2C e B2B empilhados.
+COLOUR and TYPE: verde-escuro no topo, branco no corpo, lima clara de apoio, coral só para alerta. Inter Tight + Inter.
+LAYOUT: faixa de cabeçalho com abas e período; KPIs; gráfico; insights; tabelas.
+*/
+:root{color-scheme:light dark;
+--bg:light-dark(#ffffff,#0d1714);--ink:light-dark(#10201c,#e8f1ee);--mute:light-dark(#5a6b66,#9db2ab);
+--line:light-dark(#e3ebe8,#22342f);--card:light-dark(#f6faf8,#13211d);--head:#00463c;--headink:#ffffff;
+--lime:#e6f5c8;--b2c:light-dark(#0f7a63,#3cc39f);--b2b:light-dark(#4b55c7,#8f97ff);--alert:#ff6f59;--good:light-dark(#127a4b,#4fd18e)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Inter,system-ui,sans-serif;overflow-x:clip}
+h1,h2,h3{font-family:"Inter Tight",Inter,sans-serif;line-height:1.1;margin:0;text-wrap:balance}
+.top{background:var(--head);color:var(--headink);padding:28px max(5vw,16px) 0}
+.top h1{font-size:clamp(28px,4vw,44px)}
+.top p{margin:6px 0 0;color:#cfe3dc;font-size:14px}
+.ctl{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:18px}
+.ctl select{font:inherit;font-size:15px;padding:8px 12px;border-radius:8px;border:0;background:var(--lime);color:#0b2a23;min-height:40px}
+.tabs{display:flex;gap:4px;margin-top:20px;overflow-x:auto}
+.tabs button{font:600 15px Inter,sans-serif;color:#cfe3dc;background:transparent;border:0;padding:12px 16px;border-radius:10px 10px 0 0;cursor:pointer;min-height:44px;white-space:nowrap}
+.tabs button[aria-selected=true]{background:var(--bg);color:var(--ink)}
+.tabs button:focus-visible,select:focus-visible,.seg button:focus-visible{outline:2px solid var(--lime);outline-offset:2px}
+main{padding:28px max(5vw,16px) 56px;max-width:1320px;margin:0 auto}
+.view{display:none}.view.on{display:block}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:0;border-top:2px solid var(--ink);border-bottom:1px solid var(--line)}
+.kpi{padding:16px 18px 16px 0}
+.kpi .l{font-size:13px;color:var(--mute)}
+.kpi .v{font:700 clamp(24px,3vw,32px)/1.1 "Inter Tight",sans-serif;margin-top:4px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.kpi .s{font-size:13px;color:var(--mute);margin-top:4px}
+.up{color:var(--good)}.down{color:var(--alert)}
+.sec{margin-top:36px}
+.sec h2{font-size:24px}.sec .sub{color:var(--mute);font-size:14px;margin:4px 0 14px}
+.fig{position:relative;min-height:340px}.fig>svg{position:absolute;inset:0;width:100%;height:100%}
+.leg{display:flex;flex-wrap:wrap;gap:14px;font-size:13px;color:var(--mute);margin-top:8px}
+.leg i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.seg button{font:500 14px Inter,sans-serif;padding:8px 14px;border:0;background:transparent;color:var(--ink);cursor:pointer;min-height:40px}
+.seg button[aria-pressed=true]{background:var(--ink);color:var(--bg)}
+.ins{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px}
+.card .tag{font-size:12px;font-weight:600;color:var(--mute)}
+.card h3{font-size:19px;margin:6px 0 8px}
+.card p{margin:0 0 8px;font-size:15px}
+.card .dec{border-top:1px solid var(--line);padding-top:8px;margin-top:8px;font-size:14px}
+.card .dec b{color:var(--b2c)}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,460px),1fr));gap:28px}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{font-size:12px;color:var(--mute);font-weight:600}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.bar{height:8px;background:var(--line);border-radius:4px;margin-top:5px}.bar>i{display:block;height:100%;border-radius:4px;background:var(--b2c)}
+.scroll{overflow-x:auto}
+.note{font-size:13px;color:var(--mute);margin-top:10px}
+.flow{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;counter-reset:f}
+.flow div{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px;font-size:14px}
+.flow b{display:block;font-family:"Inter Tight";font-size:16px;margin-bottom:4px}
+.tip{position:fixed;pointer-events:none;background:var(--ink);color:var(--bg);font-size:13px;padding:8px 10px;border-radius:8px;opacity:0;transition:opacity .1s;z-index:9;max-width:260px}
+footer{color:var(--mute);font-size:13px;border-top:1px solid var(--line);padding-top:14px;margin-top:48px}
+@media(max-width:600px){table{font-size:13px}.stack thead{display:none}.stack tr{display:grid;padding-block:10px}.stack td{display:flow-root;border:0;padding:3px 0;padding-inline-start:8em;text-align:start}.stack td::before{content:attr(data-l);float:inline-start;width:7.5em;margin-inline-start:-8em;white-space:normal;color:var(--mute)}.stack td:empty{display:none}.fig{min-height:280px}}
+@media(prefers-reduced-motion:reduce){.tip{transition:none}}
+</style>
+<script>new MutationObserver(()=>{for(const c of document.querySelectorAll('.stack td:not([data-l])')){let i=0,p=c;while(p=p.previousElementSibling)i+=p.colSpan;c.dataset.l=c.closest('table').rows[0].cells[i]?.textContent||''}}).observe(document,{childList:true,subtree:true})</script>
+</head>
+<body>
+<header class="top">
+  <h1>Performance de vendas: B2C + B2B</h1>
+  <p id="meta">Carregando dados…</p>
+  <div class="ctl">
+    <label for="per" style="font-size:14px;color:#cfe3dc">Período</label>
+    <select id="per"></select>
+  </div>
+  <nav class="tabs" role="tablist">
+    <button role="tab" data-v="consolidado" aria-selected="true">Consolidado</button>
+    <button role="tab" data-v="b2c" aria-selected="false">B2C</button>
+    <button role="tab" data-v="b2b" aria-selected="false">B2B</button>
+    <button role="tab" data-v="metodo" aria-selected="false">Dados e método</button>
+  </nav>
+</header>
+<main>
+  <section class="view on" id="v-consolidado">
+    <div class="kpis" id="k-cons"></div>
+    <div class="sec">
+      <div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:end">
+        <div><h2 id="t-cons">Vendas por mês</h2><p class="sub" id="s-cons"></p></div>
+        <div class="seg" id="lente"><button aria-pressed="true" data-l="bookings">Valor vendido</button><button aria-pressed="false" data-l="receita">Receita do mês</button></div>
+      </div>
+      <div class="fig"><svg id="c-cons"></svg></div>
+      <div class="leg"><span><i style="background:var(--b2c)"></i>B2C</span><span><i style="background:var(--b2b)"></i>B2B</span></div>
+      <p class="note" id="n-cons"></p>
+    </div>
+    <div class="sec"><h2>O que a gestão deve olhar</h2><p class="sub">Calculado a cada atualização. Cada achado traz a decisão sugerida.</p><div class="ins" id="ins-all"></div></div>
+  </section>
+
+  <section class="view" id="v-b2c">
+    <div class="kpis" id="k-b2c"></div>
+    <div class="sec"><h2>Receita B2C por mês e produto</h2><p class="sub">Valor pago na data da venda, sem duplicadas, estornos ou vendas zeradas.</p>
+      <div class="fig"><svg id="c-b2c"></svg></div><div class="leg" id="l-b2c"></div></div>
+    <div class="sec grid2">
+      <div><h2>Por origem</h2><p class="sub">Volume, ticket e participação na receita</p><div id="t-origem"></div></div>
+      <div><h2>Por produto</h2><p class="sub">Ticket médio por produto</p><div id="t-produto"></div></div>
+    </div>
+    <div class="sec grid2">
+      <div><h2>Cupom e desconto</h2><p class="sub">Desconto implícito contra a mediana sem cupom do mesmo produto</p><div id="t-cupom"></div></div>
+      <div><h2>Perfil do comprador</h2><p class="sub">ICP declarado na venda</p><div id="t-icp"></div></div>
+    </div>
+    <div class="sec grid2">
+      <div><h2>Eventos presenciais</h2><p class="sub">Receita por região e tipo de evento</p><div id="t-evento"></div></div>
+      <div><h2>Embaixadores</h2><p class="sub" id="s-emb"></p><div id="t-emb"></div></div>
+    </div>
+    <div class="sec"><h2>Achados do B2C</h2><div class="ins" id="ins-b2c" style="margin-top:14px"></div></div>
+  </section>
+
+  <section class="view" id="v-b2b">
+    <div class="kpis" id="k-b2b"></div>
+    <div class="sec"><h2>MRR B2B por mês</h2><p class="sub">Receita recorrente ativa no mês, sem contar duas vezes contratos já renovados.</p>
+      <div class="fig"><svg id="c-b2b"></svg></div>
+      <div class="leg"><span><i style="background:var(--b2b)"></i>MRR ativo</span></div></div>
+    <div class="sec"><h2>Renovações conta a conta</h2><p class="sub" id="s-renov"></p><div class="scroll" id="t-renov"></div></div>
+    <div class="sec grid2">
+      <div><h2>MRR por plano</h2><p class="sub">Carteira ativa na data de referência</p><div id="t-plano"></div></div>
+      <div><h2>MRR por tipo e região</h2><p class="sub">Onde está a receita recorrente</p><div id="t-tipo"></div></div>
+    </div>
+    <div class="sec"><h2>Achados do B2B</h2><div class="ins" id="ins-b2b" style="margin-top:14px"></div></div>
+  </section>
+
+  <section class="view" id="v-metodo">
+    <div class="sec" style="margin-top:0"><h2>Como os dados chegam aqui</h2><p class="sub">Atualização automática diária, sem rodar nada à mão.</p>
+      <div class="flow">
+        <div><b>1 · Coleta B2C</b>CSV exportado do Google Sheets (ou link publicado da planilha).</div>
+        <div><b>2 · Coleta B2B</b>API de contratos com token Bearer, paginada por offset.</div>
+        <div><b>3 · Tratamento</b>Python: datas, valores, duplicadas, estornos, status e contas.</div>
+        <div><b>4 · Consolidação</b>Base mensal única e CSVs tratados no repositório.</div>
+        <div><b>5 · Publicação</b>GitHub Actions todo dia às 06h17 e GitHub Pages.</div>
+      </div></div>
+    <div class="sec grid2">
+      <div><h2>Problemas encontrados no B2C</h2><div id="q-b2c"></div></div>
+      <div><h2>Problemas encontrados no B2B</h2><div id="q-b2b"></div></div>
+    </div>
+    <div class="sec"><h2>Como comparar avulso com recorrente</h2>
+      <div class="grid2" style="margin-top:12px">
+        <div class="card"><h3>Valor vendido (bookings)</h3><p>Mede a força de vendas no mês. B2C entra pelo valor pago na data da venda. B2B entra pelo valor do contrato (mensal × 12) no mês de início. É a lente de performance comercial.</p></div>
+        <div class="card"><h3>Receita do mês</h3><p>Mede o que entra no mês. B2C pelo valor vendido no mês; B2B pelo MRR ativo. Mostra o peso real de cada negócio no caixa e suaviza a sazonalidade do B2C.</p></div>
+      </div>
+      <p class="note" id="premissas"></p></div>
+    <div class="sec"><h2>Dados tratados para download</h2><p class="sub">Camada consolidada gerada a cada atualização.</p>
+      <p><a href="https://github.com/osantleandro/medway-salesops-case/tree/main/data/tratado">CSVs tratados (B2C, B2B e consolidado mensal)</a> · <a href="https://github.com/osantleandro/medway-salesops-case">Código e automação</a></p></div>
+  </section>
+  <footer id="foot"></footer>
+</main>
+<div class="tip" id="tip"></div>
+<script>
+{
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const MES=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+const ml=m=>MES[+m.slice(5)-1]+'/'+m.slice(2,4);
+const nf=(v,d=0)=>v.toLocaleString('pt-BR',{minimumFractionDigits:d,maximumFractionDigits:d});
+const brl=v=>Math.abs(v)>=1e6?'R$ '+nf(v/1e6,1)+' mi':Math.abs(v)>=1e3?'R$ '+nf(v/1e3,1)+' mil':'R$ '+nf(v);
+const pc=(v,d=0)=>nf(v,d)+'%';
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+let D,V,per='tudo',lente='bookings';
+const tip=$('#tip');
+function showTip(e,h){tip.innerHTML=h;tip.style.opacity=1;const x=Math.min(e.clientX+14,innerWidth-270);tip.style.left=x+'px';tip.style.top=(e.clientY+14)+'px'}
+function hideTip(){tip.style.opacity=0}
+
+function mesesSel(){
+  const ms=D.meses;
+  if(per==='tudo')return ms;
+  if(per==='12m')return ms.slice(-12);
+  return ms.filter(m=>m.startsWith(per));
+}
+function vendasSel(){const s=new Set(mesesSel());return V.filter(v=>s.has(v.data.slice(0,7)))}
+function agg(rows,k){const o={};for(const r of rows){const x=o[r[k]]||(o[r[k]]={n:0,valor:0});x.n++;x.valor+=r.valor}return o}
+
+function kpis(el,items){$(el).innerHTML=items.map(k=>`<div class="kpi"><div class="l">${esc(k.l)}</div><div class="v">${k.v}</div><div class="s">${k.s||''}</div></div>`).join('')}
+function delta(a,b){if(!b)return '';const d=(a/b-1)*100;return `<span class="${d>=0?'up':'down'}">${d>=0?'+':''}${pc(d)}</span>`}
+
+// gráfico de barras empilhadas com linha opcional
+function bars(svg,labels,series,colors,opt={}){
+  const draw=()=>{
+    const W=svg.clientWidth,H=svg.clientHeight;if(!W)return;
+    const sm=W<520,pl=sm?44:64,pr=12,pt=12,pb=28,iw=W-pl-pr,ih=H-pt-pb;
+    const tot=labels.map((_,i)=>series.reduce((s,x)=>s+(x[i]||0),0));
+    const line=opt.line||[];
+    const mx=Math.max(1,...tot,...line)*1.08;
+    const bw=iw/labels.length,gap=Math.max(2,bw*.22);
+    const y=v=>pt+ih-v/mx*ih;
+    let g='';
+    for(let t=0;t<=4;t++){const v=mx/4*t;g+=`<line x1="${pl}" x2="${W-pr}" y1="${y(v)}" y2="${y(v)}" stroke="${css('--line')}"/>`;g+=`<text x="${pl-6}" y="${y(v)+4}" text-anchor="end" font-size="11" fill="${css('--mute')}">${brl(v).replace('R$ ','')}</text>`}
+    labels.forEach((m,i)=>{
+      let acc=0;const x=pl+i*bw+gap/2,w=bw-gap;
+      series.forEach((s,j)=>{const v=s[i]||0;if(v<=0)return;g+=`<rect x="${x}" y="${y(acc+v)}" width="${w}" height="${y(acc)-y(acc+v)}" fill="${colors[j]}" rx="2"/>`;acc+=v});
+      const step=Math.ceil(labels.length/(sm?6:12));
+      if(i%step===0)g+=`<text x="${x+w/2}" y="${H-8}" text-anchor="middle" font-size="11" fill="${css('--mute')}">${ml(m)}</text>`;
+      g+=`<rect x="${pl+i*bw}" y="${pt}" width="${bw}" height="${ih}" fill="transparent" data-i="${i}"/>`;
+    });
+    if(line.length){const pts=line.map((v,i)=>`${pl+i*bw+bw/2},${y(v)}`).join(' ');g+=`<polyline points="${pts}" fill="none" stroke="${opt.lineColor||css('--ink')}" stroke-width="2"/>`}
+    svg.innerHTML=g;
+    svg.querySelectorAll('[data-i]').forEach(r=>{r.onmousemove=e=>showTip(e,opt.tip(+r.dataset.i));r.onmouseleave=hideTip});
+  };
+  if(svg._ro)svg._ro.disconnect();
+  svg._ro=new ResizeObserver(draw);svg._ro.observe(svg);draw();
+}
+
+function tabela(el,cols,rows,stack=true){
+  $(el).innerHTML=`<table class="${stack?'stack':''}"><thead><tr>${cols.map(c=>`<th class="${c.n?'n':''}">${esc(c.h)}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${cols.map(c=>`<td class="${c.n?'n':''}">${c.f?c.f(r):esc(r[c.k])}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+}
+const barra=(v,max,cor)=>`<div class="bar"><i style="width:${Math.max(1,100*v/max)}%;background:${cor||'var(--b2c)'}"></i></div>`;
+function insights(el,area){
+  const xs=D.insights.filter(i=>!area||i.area===area);
+  $(el).innerHTML=xs.map(i=>`<article class="card"><div class="tag">${esc(i.area)}</div><h3>${esc(i.titulo)}</h3><p>${esc(i.achado)}</p><p class="dec"><b>Decisão:</b> ${esc(i.decisao)}</p></article>`).join('');
+}
+
+function render(){
+  const ms=mesesSel(),set=new Set(ms),C=D.consolidado.filter(r=>set.has(r.mes)),vs=vendasSel();
+  const b2c=C.reduce((s,r)=>s+r.b2c_valor,0),b2bBook=C.reduce((s,r)=>s+r.b2b_bookings,0),rec=C.reduce((s,r)=>s+r.receita_mes,0);
+  const ult=C[C.length-1];
+  // período anterior de mesmo tamanho para comparação
+  const i0=D.meses.indexOf(ms[0]),prev=D.consolidado.slice(Math.max(0,i0-ms.length),i0);
+  const pB2c=prev.length===ms.length?prev.reduce((s,r)=>s+r.b2c_valor,0):0;
+  const pRec=prev.length===ms.length?prev.reduce((s,r)=>s+r.receita_mes,0):0;
+  kpis('#k-cons',[
+    {l:'Valor vendido no período',v:brl(b2c+b2bBook),s:`B2C ${brl(b2c)} · B2B ${brl(b2bBook)}`},
+    {l:'Receita do período',v:brl(rec),s:pRec?`${delta(rec,pRec)} vs período anterior`:'sem período anterior comparável'},
+    {l:'Peso do B2B na receita',v:pc(100*C.reduce((s,r)=>s+r.b2b_mrr,0)/rec,1),s:'MRR ativo ÷ receita total do período'},
+    {l:`MRR B2B em ${ml(ult.mes)}`,v:brl(ult.b2b_mrr),s:`${nf(ult.b2b_licencas)} licenças em ${ult.b2b_contratos} contratos`},
+    {l:'Vendas B2C',v:nf(C.reduce((s,r)=>s+r.b2c_vendas,0)),s:pB2c?`${delta(b2c,pB2c)} em valor vs período anterior`:''},
+  ]);
+  const isB=lente==='bookings';
+  $('#t-cons').textContent=isB?'Valor vendido por mês':'Receita por mês';
+  $('#s-cons').textContent=isB?'B2C pelo valor pago na venda; B2B pelo valor do contrato (mensal × 12) no mês de início.':'B2C pelo valor vendido no mês; B2B pelo MRR ativo no mês.';
+  $('#n-cons').textContent=isB?'Os picos do B2B são meses de início ou renovação de contrato. Por isso a lente de receita é a melhor para ver o peso real de cada negócio.':'Na receita do mês o B2B vira uma faixa estável, e a sazonalidade do B2C fica evidente.';
+  bars($('#c-cons'),ms,[C.map(r=>r.b2c_valor),C.map(r=>isB?r.b2b_bookings:r.b2b_mrr)],[css('--b2c'),css('--b2b')],{tip:i=>{const r=C[i];const b=isB?r.b2b_bookings:r.b2b_mrr;return `<b>${ml(r.mes)}</b><br>B2C ${brl(r.b2c_valor)} (${r.b2c_vendas} vendas)<br>B2B ${brl(b)}${isB?` (${r.b2b_novos} novos, ${r.b2b_renov} renov.)`:''}<br>Total ${brl(r.b2c_valor+b)}`}});
+
+  // B2C
+  const tot=vs.reduce((s,v)=>s+v.valor,0);
+  const dc=D.b2c.desconto_por_cupom;
+  const descMed=Object.values(dc).reduce((s,x)=>s+x.n*x.desconto_medio_pct,0)/Object.values(dc).reduce((s,x)=>s+x.n,0);
+  const pv=prev.length===ms.length?V.filter(v=>prev.some(r=>r.mes===v.data.slice(0,7))):[];
+  const pt=pv.reduce((s,v)=>s+v.valor,0);
+  kpis('#k-b2c',[
+    {l:'Receita B2C',v:brl(tot),s:pt?`${delta(tot,pt)} vs período anterior`:''},
+    {l:'Vendas',v:nf(vs.length),s:pv.length?`${delta(vs.length,pv.length)} vs período anterior`:''},
+    {l:'Ticket médio',v:brl(tot/vs.length),s:pt?`${delta(tot/vs.length,pt/pv.length)} vs período anterior`:''},
+    {l:'Vendas com cupom',v:pc(100*vs.filter(v=>v.cupom_familia!=='Sem cupom').length/vs.length),s:`desconto implícito médio ${pc(descMed,1)}`},
+  ]);
+  const prods=Object.keys(D.b2c.serie_produto);
+  const pal=[css('--b2c'),'#6bb59d','#a9d8c6','#2f5d52',css('--b2b')];
+  bars($('#c-b2c'),ms,prods.map(p=>ms.map(m=>D.b2c.serie_produto[p][D.meses.indexOf(m)])),pal,{tip:i=>`<b>${ml(ms[i])}</b><br>`+prods.map((p,j)=>`${esc(p)}: ${brl(D.b2c.serie_produto[p][D.meses.indexOf(ms[i])])}`).join('<br>')});
+  $('#l-b2c').innerHTML=prods.map((p,j)=>`<span><i style="background:${pal[j]}"></i>${esc(p)}</span>`).join('');
+  const lista=(o)=>Object.entries(o).map(([k,x])=>({k,...x,ticket:x.valor/x.n})).sort((a,b)=>b.valor-a.valor);
+  const og=lista(agg(vs,'origem'));const mxo=Math.max(...og.map(x=>x.valor));
+  tabela('#t-origem',[{h:'Origem',k:'k',f:r=>esc(r.k)+barra(r.valor,mxo)},{h:'Vendas',n:1,f:r=>nf(r.n)},{h:'Receita',n:1,f:r=>brl(r.valor)},{h:'Ticket',n:1,f:r=>brl(r.ticket)},{h:'% receita',n:1,f:r=>pc(100*r.valor/tot,1)}],og);
+  const pr=lista(agg(vs,'produto'));const mxp=Math.max(...pr.map(x=>x.ticket));
+  tabela('#t-produto',[{h:'Produto',k:'k',f:r=>esc(r.k)+barra(r.ticket,mxp)},{h:'Vendas',n:1,f:r=>nf(r.n)},{h:'Receita',n:1,f:r=>brl(r.valor)},{h:'Ticket',n:1,f:r=>brl(r.ticket)}],pr);
+  const cp=lista(agg(vs,'cupom_familia'));
+  tabela('#t-cupom',[{h:'Cupom',k:'k'},{h:'Vendas',n:1,f:r=>nf(r.n)},{h:'% vendas',n:1,f:r=>pc(100*r.n/vs.length,1)},{h:'Ticket',n:1,f:r=>brl(r.ticket)},{h:'Desconto',n:1,f:r=>{const d=dc[r.k]?.desconto_medio_pct;return d==null?'':`<span class="${d>5?'down':''}">${pc(d,1)}</span>`}}],cp);
+  const ic=lista(agg(vs,'icp'));const mxi=Math.max(...ic.map(x=>x.valor));
+  tabela('#t-icp',[{h:'Comprador',k:'k',f:r=>esc(r.k)+barra(r.valor,mxi)},{h:'Vendas',n:1,f:r=>nf(r.n)},{h:'Receita',n:1,f:r=>brl(r.valor)},{h:'Ticket',n:1,f:r=>brl(r.ticket)}],ic);
+  const ev=vs.filter(v=>v.origem==='Evento Presencial');
+  const er=lista(agg(ev,'regiao_evento')).map(x=>({...x,k:x.k||'Não informada'}));const mxe=Math.max(...er.map(x=>x.valor),1);
+  const et=lista(agg(ev,'tipo_evento'));
+  $('#t-evento').innerHTML='';tabela('#t-evento',[{h:'Região',k:'k',f:r=>esc(r.k)+barra(r.valor,mxe,css('--b2b'))},{h:'Vendas',n:1,f:r=>nf(r.n)},{h:'Receita',n:1,f:r=>brl(r.valor)},{h:'Ticket',n:1,f:r=>brl(r.ticket)}],er);
+  $('#t-evento').insertAdjacentHTML('beforeend','<div style="height:14px"></div><div id="t-evento2"></div>');
+  tabela('#t-evento2',[{h:'Tipo de evento',k:'k'},{h:'Vendas',n:1,f:r=>nf(r.n)},{h:'Receita',n:1,f:r=>brl(r.valor)},{h:'Ticket',n:1,f:r=>brl(r.ticket)}],et);
+  const em=lista(agg(vs.filter(v=>v.origem==='Embaixador'),'embaixador'));const tem=em.reduce((s,x)=>s+x.valor,0);
+  const t10=em.slice(0,10).reduce((s,x)=>s+x.valor,0);
+  $('#s-emb').textContent=`${em.length} embaixadores no período; os 10 maiores fazem ${pc(100*t10/(tem||1))} da receita do canal.`;
+  tabela('#t-emb',[{h:'Embaixador',k:'k'},{h:'Vendas',n:1,f:r=>nf(r.n)},{h:'Receita',n:1,f:r=>brl(r.valor)},{h:'Ticket',n:1,f:r=>brl(r.ticket)}],em.slice(0,10));
+
+  // B2B
+  const B=D.b2b;
+  kpis('#k-b2b',[
+    {l:`MRR em ${ml(ult.mes)}`,v:brl(ult.b2b_mrr),s:`ARR ${brl(ult.b2b_mrr*12)}`},
+    {l:'Contas ativas',v:nf(B.contas_ativas),s:`${nf(ult.b2b_licencas)} licenças`},
+    {l:'Retenção líquida na renovação',v:pc(B.nrr_renovacao_pct,1),s:`licenças +${pc(B.licencas_var_pct,1)}`},
+    {l:'Novos logos no período',v:nf(C.reduce((s,r)=>s+r.b2b_novos,0)),s:`${C.reduce((s,r)=>s+r.b2b_renov,0)} renovações`},
+  ]);
+  bars($('#c-b2b'),ms,[C.map(r=>r.b2b_mrr)],[css('--b2b')],{tip:i=>{const r=C[i];return `<b>${ml(r.mes)}</b><br>MRR ${brl(r.b2b_mrr)}<br>${r.b2b_contratos} contratos · ${nf(r.b2b_licencas)} licenças${r.b2b_mrr_expansao?`<br>Expansão ${brl(r.b2b_mrr_expansao)}`:''}${r.b2b_novos?`<br>Novos logos: ${r.b2b_novos}`:''}`}});
+  const rn=[...B.renovacoes].sort((a,b)=>b.mrr_depois-a.mrr_depois);
+  $('#s-renov').textContent=`${rn.length} de ${B.contas_total} contas renovaram. MRR dessas contas foi de ${brl(rn.reduce((s,r)=>s+r.mrr_antes,0))} para ${brl(rn.reduce((s,r)=>s+r.mrr_depois,0))}.`;
+  tabela('#t-renov',[{h:'Conta',k:'conta'},{h:'Plano',k:'plano'},{h:'Status anterior',f:r=>r.status_anterior==='ativo'?'ativo':`<span class="down">${esc(r.status_anterior)}</span>`},{h:'Licenças',n:1,f:r=>`${r.lic_antes} → ${r.lic_depois}`},{h:'MRR antes',n:1,f:r=>brl(r.mrr_antes)},{h:'MRR depois',n:1,f:r=>brl(r.mrr_depois)},{h:'Var.',n:1,f:r=>`<span class="up">+${pc(r.var_pct,1)}</span>`}],rn);
+  const pl=lista(B.por_plano);const mpl=Math.max(...pl.map(x=>x.valor));
+  tabela('#t-plano',[{h:'Plano',k:'k',f:r=>esc(r.k)+barra(r.valor,mpl,css('--b2b'))},{h:'Contas',n:1,f:r=>nf(r.n)},{h:'MRR',n:1,f:r=>brl(r.valor)},{h:'% MRR',n:1,f:r=>pc(100*r.valor/B.mrr_atual)},{h:'R$/licença',n:1,f:r=>'R$ '+(B.preco_licenca_plano[r.k]||[]).join(' / ')}],pl);
+  const tp=lista(B.por_tipo),rg=lista(B.por_regiao);
+  tabela('#t-tipo',[{h:'Tipo',k:'k'},{h:'Contas',n:1,f:r=>nf(r.n)},{h:'MRR',n:1,f:r=>brl(r.valor)},{h:'% MRR',n:1,f:r=>pc(100*r.valor/B.mrr_atual)}],tp);
+  $('#t-tipo').insertAdjacentHTML('beforeend','<div style="height:14px"></div><div id="t-reg"></div>');
+  tabela('#t-reg',[{h:'Região',k:'k'},{h:'Contas',n:1,f:r=>nf(r.n)},{h:'MRR',n:1,f:r=>brl(r.valor)},{h:'% MRR',n:1,f:r=>pc(100*r.valor/B.mrr_atual)}],rg);
+}
+
+function metodo(){
+  const q=D.qualidade.b2c,qb=D.qualidade.b2b;
+  const fd=Object.entries(q.formatos_data).map(([k,v])=>`${k}: ${nf(v)}`).join(' · ');
+  const fv=Object.entries(q.formatos_valor).map(([k,v])=>`${k}: ${nf(v)}`).join(' · ');
+  tabela('#q-b2c',[{h:'Problema',k:'p'},{h:'Tratamento',k:'t'}],[
+    {p:`Datas em ${Object.keys(q.formatos_data).length} formatos (${fd})`,t:'Convertidas para AAAA-MM-DD'},
+    {p:`Valores em ${Object.keys(q.formatos_valor).length} formatos (${fv})`,t:'Convertidos para número em reais'},
+    {p:`${q.duplicadas} linhas duplicadas`,t:'Removidas (linha idêntica em todas as colunas)'},
+    {p:`${q.valor_invalido.length} vendas com valor ≤ 0 (${q.valor_invalido.map(v=>brl(v.valor)).join(', ')})`,t:'Fora da receita; listadas para conferência'},
+    {p:`${q.regiao_padronizada} regiões em minúsculas`,t:'Padronizadas em maiúsculas'},
+    {p:`${q.embaixador_sem_nome} vendas de embaixador sem nome e ${q.evento_sem_tipo} de evento sem tipo`,t:'Mantidas como "Não informado"'},
+    {p:'Coluna quarter sem ano (Q1/25 e Q1/26 iguais)',t:'Trimestre recalculado a partir da data'},
+  ]);
+  tabela('#q-b2b',[{h:'Problema',k:'p'},{h:'Tratamento',k:'t'}],[
+    {p:`${qb.status_desatualizado} contratos "ativos" já substituídos pela renovação`,t:'Status tratado como renovado; MRR contado uma vez'},
+    {p:'Sem data de fim de contrato',t:`Vigência de ${D.premissas.vigencia_b2b_meses} meses ou até a renovação`},
+    {p:'Mesma instituição com nomes diferentes ("- Renovação 2026", "- Turma 2026")',t:`Unificadas em ${qb.contas} contas`},
+    {p:`Status "pausado" e "churn" em contas que renovaram (${Object.entries(qb.status_brutos).map(([k,v])=>k+': '+v).join(', ')})`,t:'Mantidos e sinalizados na tabela de renovações'},
+  ]);
+  $('#premissas').textContent='Premissas: '+Object.values(D.premissas).join(' · ')+'.';
+}
+
+function init(d){
+  D=d;V=d.vendas.rows.map(r=>Object.fromEntries(d.vendas.cols.map((c,i)=>[c,r[i]])));
+  const anos=[...new Set(d.meses.map(m=>m.slice(0,4)))];
+  $('#per').innerHTML=`<option value="tudo">Tudo (${ml(d.meses[0])} a ${ml(d.meses.at(-1))})</option><option value="12m">Últimos 12 meses</option>`+anos.map(a=>`<option value="${a}">${a}</option>`).join('');
+  $('#meta').textContent=`Atualizado em ${d.gerado_em} · B2C: ${d.fontes.b2c} · B2B: API de contratos`;
+  $('#foot').innerHTML=`Dados do case técnico de SalesOps. Atualização automática diária via GitHub Actions. Gerado em ${esc(d.gerado_em)}.`;
+  insights('#ins-all');insights('#ins-b2c','B2C');insights('#ins-b2b','B2B');
+  metodo();render();
+  irPara(location.hash.slice(1));
+}
+function irPara(h){const tb=h&&document.querySelector(`.tabs button[data-v="${h}"]`);if(tb&&tb.getAttribute('aria-selected')!=='true')tb.click()}
+addEventListener('hashchange',()=>D&&irPara(location.hash.slice(1)));
+
+$('#per').onchange=e=>{per=e.target.value;render()};
+$('#lente').onclick=e=>{const b=e.target.closest('button');if(!b)return;lente=b.dataset.l;$('#lente').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b));render()};
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('.tabs button').forEach(x=>x.setAttribute('aria-selected',x===b));
+  document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on',v.id==='v-'+b.dataset.v));
+  history.replaceState(null,'','#'+b.dataset.v);render();
+});
+fetch('data.json',{cache:'no-store'}).then(r=>r.json()).then(init).catch(e=>{$('#meta').textContent='Não foi possível carregar os dados: '+e.message});
+}
+</script>
+</body>
+</html>

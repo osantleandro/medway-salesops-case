@@ -1,0 +1,29 @@
+id_contrato,conta,instituicao,tipo,regiao,plano,produto,num_licencas,valor_mensal,preco_licenca,data_inicio,fim,tipo_venda,anterior,status,status_tratado
+C514,Universidade Estadual Paulista,Universidade Estadual Paulista,Universidade,SP,Institucional Pro,Extensivo R1,100,7900,79.0,2025-01-01,2026-01-01,Novo logo,,ativo,renovado
+C515,Liga Acadêmica de Neurologia UFRJ,Liga Acadêmica de Neurologia UFRJ,Liga,RJ,Institucional Basic,Extensivo R+,30,1170,39.0,2025-01-01,2026-01-01,Novo logo,,ativo,renovado
+C516,Faculdade de Medicina do ABC,Faculdade de Medicina do ABC,Faculdade,SP,Institucional Enterprise,Trilha Institucional,120,17880,149.0,2025-02-01,2026-02-01,Novo logo,,ativo,renovado
+C517,Universidade Federal de Goiás,Universidade Federal de Goiás,Universidade,CO,Institucional Pro,Extensivo R1,70,5530,79.0,2025-02-01,2026-02-01,Novo logo,,ativo,renovado
+C518,Liga Acadêmica de Pediatria UFPR,Liga Acadêmica de Pediatria UFPR,Liga,SUL,Institucional Basic,Extensivo R1,25,975,39.0,2025-03-01,2026-03-01,Novo logo,,ativo,renovado
+C519,Universidade Federal do Amazonas,Universidade Federal do Amazonas,Universidade,N,Institucional Pro,Trilha Institucional,60,4740,79.0,2025-03-01,2026-03-01,Novo logo,,pausado,pausado
+C520,Faculdade de Medicina de Ribeirão Preto,Faculdade de Medicina de Ribeirão Preto,Faculdade,SP,Institucional Enterprise,Extensivo R1,90,13410,149.0,2025-04-01,2026-04-01,Novo logo,,ativo,renovado
+C521,Liga de Trauma e Emergência UFMG,Liga de Trauma e Emergência UFMG,Liga,MG,Institucional Basic,Extensivo R+,40,1560,39.0,2025-04-01,2026-04-01,Novo logo,,ativo,renovado
+C522,Universidade Federal da Bahia,Universidade Federal da Bahia,Universidade,NE,Institucional Pro,Extensivo R1,80,6320,79.0,2025-05-01,2026-05-01,Novo logo,,ativo,renovado
+C523,Centro Universitário do Pará,Centro Universitário do Pará,Faculdade,N,Institucional Basic,Trilha Institucional,35,1365,39.0,2025-05-01,2026-05-01,Novo logo,,churn,churn
+C524,Liga Acadêmica de Ginecologia UNIFESP,Liga Acadêmica de Ginecologia UNIFESP,Liga,SP,Institucional Pro,Extensivo R1,45,3555,79.0,2025-06-01,2026-06-01,Novo logo,,ativo,renovado
+C525,Universidade Federal de Santa Catarina,Universidade Federal de Santa Catarina,Universidade,SUL,Institucional Enterprise,Trilha Institucional,110,16390,149.0,2025-06-01,2026-06-01,Novo logo,,ativo,renovado
+C526,Faculdade de Medicina de Maceió,Faculdade de Medicina de Maceió,Faculdade,NE,Institucional Basic,Extensivo R+,30,1170,39.0,2025-07-01,2026-07-01,Novo logo,,ativo,renovado
+C527,Liga de Clínica Médica UnB,Liga de Clínica Médica UnB,Liga,CO,Institucional Pro,Extensivo R1,55,4345,79.0,2025-07-01,2026-07-01,Novo logo,,ativo,renovado
+C528,Universidade Estadual Paulista,Universidade Estadual Paulista - Renovação 2026,Universidade,SP,Institucional Pro,Extensivo R1,115,9085,79.0,2026-01-01,2027-01-01,Renovação,C514,ativo,ativo
+C529,Liga Acadêmica de Neurologia UFRJ,Liga Acadêmica de Neurologia UFRJ - Turma 2026,Liga,RJ,Institucional Basic,Extensivo R+,38,1482,39.0,2026-01-01,2027-01-01,Renovação,C515,ativo,ativo
+C530,Faculdade de Medicina do ABC,Faculdade de Medicina do ABC - Renovação 2026,Faculdade,SP,Institucional Enterprise,Trilha Institucional,135,20115,149.0,2026-02-01,2027-02-01,Renovação,C516,ativo,ativo
+C531,Universidade Federal de Goiás,Universidade Federal de Goiás - Turma 2026,Universidade,CO,Institucional Pro,Extensivo R1,82,6478,79.0,2026-02-01,2027-02-01,Renovação,C517,ativo,ativo
+C532,Liga Acadêmica de Pediatria UFPR,Liga Acadêmica de Pediatria UFPR - Turma 2026,Liga,SUL,Institucional Basic,Extensivo R1,32,1248,39.0,2026-03-01,2027-03-01,Renovação,C518,ativo,ativo
+C533,Universidade Federal do Amazonas,Universidade Federal do Amazonas - Renovação,Universidade,N,Institucional Pro,Trilha Institucional,72,5688,79.0,2026-03-01,2027-03-01,Renovação,C519,ativo,ativo
+C534,Faculdade de Medicina de Ribeirão Preto,Faculdade de Medicina de Ribeirão Preto - Turma 2026,Faculdade,SP,Institucional Enterprise,Extensivo R1,105,15645,149.0,2026-04-01,2027-04-01,Renovação,C520,ativo,ativo
+C535,Liga de Trauma e Emergência UFMG,Liga de Trauma e Emergência UFMG - Turma 2026,Liga,MG,Institucional Basic,Extensivo R+,48,1872,39.0,2026-04-01,2027-04-01,Renovação,C521,ativo,ativo
+C536,Universidade Federal da Bahia,Universidade Federal da Bahia - Renovação 2026,Universidade,NE,Institucional Pro,Extensivo R1,95,7505,79.0,2026-05-01,2027-05-01,Renovação,C522,ativo,ativo
+C537,Centro Universitário do Pará,Centro Universitário do Pará - Nova Turma,Faculdade,N,Institucional Basic,Trilha Institucional,42,1638,39.0,2026-05-01,2027-05-01,Renovação,C523,ativo,ativo
+C538,Liga Acadêmica de Ginecologia UNIFESP,Liga Acadêmica de Ginecologia UNIFESP - Turma 2026,Liga,SP,Institucional Pro,Extensivo R1,58,4582,79.0,2026-06-01,2027-06-01,Renovação,C524,ativo,ativo
+C539,Universidade Federal de Santa Catarina,Universidade Federal de Santa Catarina - Renovação,Universidade,SUL,Institucional Enterprise,Trilha Institucional,125,18625,149.0,2026-06-01,2027-06-01,Renovação,C525,ativo,ativo
+C540,Faculdade de Medicina de Maceió,Faculdade de Medicina de Maceió - Turma 2026,Faculdade,NE,Institucional Basic,Extensivo R+,36,1404,39.0,2026-07-01,2027-07-01,Renovação,C526,ativo,ativo
+C541,Liga de Clínica Médica UnB,Liga de Clínica Médica UnB - Turma 2026,Liga,CO,Institucional Pro,Extensivo R1,68,5372,79.0,2026-07-01,2027-07-01,Renovação,C527,ativo,ativo
